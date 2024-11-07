@@ -12,13 +12,11 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
   site: "https://example.com",
 
-  integrations: [mdx(), sitemap()]
+  integrations: [mdx(), sitemap()],
   /* output: "hybrid", */
 
   /*   adapter: node({
     mode: "standalone",
-  }), */,
-
-  output: "server",
-  adapter: cloudflare()
+  }), */ output: "hybrid",
+  adapter: cloudflare(),
 });
