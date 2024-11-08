@@ -1,48 +1,59 @@
-import type { APIRoute } from "astro";
-import { getCollection, getEntry } from "astro:content";
+import type { APIRoute, GetStaticPaths } from "astro";
+import { getEntry } from "astro:content";
 import { Clients, db, eq } from "astro:db";
-import { E } from "../../../dist/_worker.js/chunks/astro/assets-service_sDQW2Zyw.mjs";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request }) => {
-  return new Response(
-    JSON.stringify({
-      method: "GET",
-    }),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  /*   const body = {
+    method: 'GET',
+  }; */
+
+  //select * from clients
+  const users = await db.select().from(Clients);
+
+  return new Response(JSON.stringify(users), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };
 
 export const POST: APIRoute = async ({ params, request }) => {
-  const { id } = await params;
+  try {
+    const { id, ...body } = await request.json();
 
-  return new Response(
-    JSON.stringify({
-      method: "POST",
-      clientId: id,
-    }),
-    {
-      status: 200,
+    const { lastInsertRowid } = await db.insert(Clients).values(body);
+
+    return new Response(
+      JSON.stringify({ id: +lastInsertRowid!.toString(), ...body }),
+      {
+        status: 201,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
+
+    return new Response(JSON.stringify({ msg: "no body found" }), {
+      status: 201,
       headers: {
         "Content-Type": "application/json",
       },
-    }
-  );
+    });
+  }
 };
 
 export const PUT: APIRoute = async ({ params, request }) => {
-  const { id } = await params;
+  const body = await request.json();
 
   return new Response(
     JSON.stringify({
       method: "PUT",
-      clientId: id,
+      ...body,
     }),
     {
       status: 200,
@@ -54,24 +65,24 @@ export const PUT: APIRoute = async ({ params, request }) => {
 };
 
 export const PATCH: APIRoute = async ({ params, request }) => {
-  const clientId = params.id ?? "";
-  //console.log("id", clientId);
+  const clientId = params.clientId ?? "";
+
   try {
     const { id, ...body } = await request.json();
 
     //update xxx=xxx, from Tabla ?? sin el where
-    console.log();
+
     const results = await db
       .update(Clients)
       .set(body)
       .where(eq(Clients.id, +clientId));
 
-    const updatedClient = await db
+    const updateClient = await db
       .select()
       .from(Clients)
       .where(eq(Clients.id, +clientId));
 
-    return new Response(JSON.stringify(updatedClient.at(0)), {
+    return new Response(JSON.stringify(updateClient), {
       status: 201,
       headers: {
         "Content-Type": "application/json",
@@ -90,25 +101,15 @@ export const PATCH: APIRoute = async ({ params, request }) => {
 };
 
 export const DELETE: APIRoute = async ({ params, request }) => {
-  const clientId = params.id ?? "";
-
-  const { rowsAffected } = await db
-    .delete(Clients)
-    .where(eq(Clients.id, +clientId));
-
-  if (rowsAffected > 0) {
-    return new Response(JSON.stringify({ msg: "Deleted" }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
+  const { slug } = params;
 
   return new Response(
-    JSON.stringify({ msg: `CLient with id ${clientId} not found` }),
+    JSON.stringify({
+      method: "DELETE",
+      slug: slug,
+    }),
     {
-      status: 404,
+      status: 200,
       headers: {
         "Content-Type": "application/json",
       },
