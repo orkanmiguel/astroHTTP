@@ -6,17 +6,30 @@ import { E } from "../../../dist/_worker.js/chunks/astro/assets-service_sDQW2Zyw
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request }) => {
-  return new Response(
-    JSON.stringify({
-      method: "GET",
-    }),
-    {
-      status: 200,
+  const clientId = params.id ?? "";
+  ///console.log("Revisando id", clientId);
+  //const users = await db.select().from(Clients);
+
+  const clients = await db
+    .select()
+    .from(Clients)
+    .where(eq(Clients.id, +clientId));
+
+  console.log("Revisando clients", clients);
+  if (clients.length === 0) {
+    return new Response(JSON.stringify({ msg: `id : ${clientId} no existe` }), {
+      status: 201,
       headers: {
         "Content-Type": "application/json",
       },
-    }
-  );
+    });
+  }
+  return new Response(JSON.stringify(clients.at(0)), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };
 
 export const POST: APIRoute = async ({ params, request }) => {
