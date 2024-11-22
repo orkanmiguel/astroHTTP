@@ -6,30 +6,62 @@
   <button v-else @click="likePost">
     Likes <span>{{ likeCount }}</span>
   </button>
+
+  <!--   {{ likeClicks }} -->
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import confetti from "canvas-confetti";
+import debounce from "lodash.debounce";
+
 interface Props {
-  postID: string;
+  postId: string;
 }
 
 const props = defineProps<Props>();
+
+console.log("porps", props.postId);
 
 const likeCount = ref(0);
 const likeClicks = ref(0);
 const isLoading = ref(true);
 
+watch(
+  likeCount,
+  debounce(() => {
+    fetch(`/api/posts/likes/${props.postId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ likes: likeClicks.value }),
+    });
+    likeClicks.value = 0;
+  }, 500)
+);
+
 const likePost = () => {
-  console.log("1+ like");
+  //console.log("1+ like");
+  likeCount.value++;
+  likeClicks.value++;
+
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: {
+      x: Math.random(),
+      y: Math.random() - 0.2,
+    },
+  });
 };
 
 const getCurrentLikes = async () => {
-  const resp = await fetch(`/api/posts/likes/${props.postID}`);
+  const resp = await fetch(`/api/posts/likes/${props.postId}`);
   if (!resp.ok) return;
 
   const data = await resp.json();
-  console.log("data", data.likes);
+  //console.log("data", data);
   likeCount.value = data.likes;
   isLoading.value = false;
 };
