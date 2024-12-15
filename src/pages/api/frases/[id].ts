@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getCollection, getEntry } from "astro:content";
-import { Clients, db, eq } from "astro:db";
-import { E } from "../../../dist/_worker.js/chunks/astro/assets-service_sDQW2Zyw.mjs";
+import { Clients, db, eq, FrasesM } from "astro:db";
+import { E } from "../../../../dist/_worker.js/chunks/astro/assets-service_sDQW2Zyw.mjs";
 
 export const prerender = false;
 
@@ -12,8 +12,8 @@ export const GET: APIRoute = async ({ params, request }) => {
 
   const clients = await db
     .select()
-    .from(Clients)
-    .where(eq(Clients.id, +clientId));
+    .from(FrasesM)
+    .where(eq(FrasesM.id, +clientId));
 
   console.log("Revisando clients", clients);
   if (clients.length === 0) {
@@ -75,14 +75,14 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     //update xxx=xxx, from Tabla ?? sin el where
     console.log();
     const results = await db
-      .update(Clients)
+      .update(FrasesM)
       .set(body)
-      .where(eq(Clients.id, +clientId));
+      .where(eq(FrasesM.id, +clientId));
 
     const updatedClient = await db
       .select()
-      .from(Clients)
-      .where(eq(Clients.id, +clientId));
+      .from(FrasesM)
+      .where(eq(FrasesM.id, +clientId));
 
     return new Response(JSON.stringify(updatedClient.at(0)), {
       status: 201,
@@ -106,8 +106,8 @@ export const DELETE: APIRoute = async ({ params, request }) => {
   const clientId = params.id ?? "";
 
   const { rowsAffected } = await db
-    .delete(Clients)
-    .where(eq(Clients.id, +clientId));
+    .delete(FrasesM)
+    .where(eq(FrasesM.id, +clientId));
 
   if (rowsAffected > 0) {
     return new Response(JSON.stringify({ msg: "Deleted" }), {

@@ -17,10 +17,19 @@ const Post = defineTable({
   },
 });
 
+const FrasesM = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true }),
+    title: column.text(),
+    fraseM: column.text(),
+  },
+});
+
 // https://astro.build/db/config
 export default defineDb({
   tables: {
     Clients,
     Post,
+    FrasesM,
   },
 });

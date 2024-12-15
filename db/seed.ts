@@ -1,5 +1,5 @@
 import { getCollection } from "astro:content";
-import { Clients, db, Post } from "astro:db";
+import { Clients, db, FrasesM, Post } from "astro:db";
 
 // https://astro.build/db/seed
 export default async function seed() {
@@ -22,6 +22,13 @@ export default async function seed() {
       likes: Math.round(Math.random() * 100),
     }))
   );
+
+  await db.insert(FrasesM).values([
+    { id: 1, title: "Paso a Paso", fraseM: "sss" },
+    { id: 2, title: "Poder del ahora", fraseM: "sss" },
+    { id: 3, title: "Diciplina", fraseM: "sss" },
+    { id: 4, title: "Adaptarse", fraseM: "sss" },
+  ]);
 
   console.log("seed ");
 }
