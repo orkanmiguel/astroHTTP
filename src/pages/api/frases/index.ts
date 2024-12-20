@@ -21,10 +21,11 @@ export const GET: APIRoute = async ({ params, request }) => {
 };
 
 export const POST: APIRoute = async ({ params, request }) => {
+  //TODO: aca se puede evaluar las escepciones del body que se debe recibir.
   try {
     const { id, ...body } = await request.json();
 
-    const { lastInsertRowid } = await db.insert(Clients).values(body);
+    const { lastInsertRowid } = await db.insert(FrasesM).values(body);
 
     return new Response(
       JSON.stringify({ id: +lastInsertRowid!.toString(), ...body }),

@@ -9,7 +9,7 @@ export const GET: APIRoute = async ({ params, request }) => {
   const clientId = params.id ?? "";
   ///console.log("Revisando id", clientId);
   //const users = await db.select().from(Clients);
-  console.log("entro");
+
   const clients = await db
     .select()
     .from(Clients)
@@ -18,7 +18,7 @@ export const GET: APIRoute = async ({ params, request }) => {
   console.log("Revisando clients", clients);
   if (clients.length === 0) {
     return new Response(JSON.stringify({ msg: `id : ${clientId} no existe` }), {
-      status: 201,
+      status: 404,
       headers: {
         "Content-Type": "application/json",
       },
